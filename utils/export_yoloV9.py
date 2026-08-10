@@ -82,7 +82,7 @@ def main(args):
     print("Opening YOLOv9 model")
 
     device = torch.device("cpu")
-    model, head = yolov9_export(args.weights, device)
+    model, head = yolov9_export(args.weights, device, fuse=False)
 
     if len(model.names.keys()) > 0:
         print("Creating labels.txt file")
@@ -119,7 +119,8 @@ def main(args):
         do_constant_folding=True,
         input_names=["input"],
         output_names=["output"],
-        dynamic_axes=dynamic_axes if args.dynamic else None
+        dynamic_axes=dynamic_axes if args.dynamic else None,
+        dynamo=False,               # IMPORTANT: force legacy exporter
     )
 
     if args.simplify:

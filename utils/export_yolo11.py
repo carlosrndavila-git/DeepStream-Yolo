@@ -72,7 +72,7 @@ def main(args):
     print("Opening YOLO11 model")
 
     device = torch.device("cpu")
-    model = yolo11_export(args.weights, device)
+    model = yolo11_export(args.weights, device, fuse=False)
 
     if len(model.names.keys()) > 0:
         print("Creating labels.txt file")
