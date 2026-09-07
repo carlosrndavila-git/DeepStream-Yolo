@@ -439,3 +439,22 @@ Basically, you need manipulate the `NvDsObjectMeta` ([Python](https://docs.nvidi
 ##
 
 My projects: https://www.youtube.com/MarcosLucianoTV
+
+# Standard final-detection callback
+
+`NvDsInferParseYoloFinal` accepts one FLOAT output tensor per inference member,
+shaped `[N,6]`: `x1,y1,x2,y2,confidence,class_id` in network-input pixels.
+Use it only with an end-to-end model whose output is already final, such as a
+standard Ultralytics YOLO26 end-to-end ONNX. Tensor dimensions alone cannot
+establish that semantic contract.
+
+Configure `network-type=0`, `parse-bbox-func-name=NvDsInferParseYoloFinal`, and
+`cluster-mode=4`. The callback performs inclusive per-class confidence filtering
+using the SDK's pre-cluster thresholds. It performs no NMS, clipping, minimum-box
+filtering, sorting, or additional detection limiting. nvinfer owns frame
+projection and downstream metadata filtering. Qualify those SDK behaviors
+separately. For a model capped at 300 output rows, `topk=300` cannot remove an
+additional row. Invalid tensor/type/class data fails explicitly.
+
+The callback builds into the existing library via its Makefile. Build on the
+deployment host; the legacy `NvDsInferParseYolo` entry point is unchanged.
